@@ -1,0 +1,148 @@
+package com.thinkgem.jeesite.sierac.web;
+
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.sys.entity.User;
+import com.thinkgem.jeesite.sierac.entity.Factory;
+import com.thinkgem.jeesite.sierac.service.FactoryService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * 工厂控制层：
+ * Created by jkf on 2017/6/1.
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/sierac/factory")
+public class FactoryController extends BaseController {
+
+    @Autowired
+    private FactoryService factoryService;
+
+    /**
+     * 详细和修改使用接口
+     * @param id
+     * @return
+     */
+    @ModelAttribute
+    public Factory get(@RequestParam(required = false) String id) {
+        Factory entity = null;
+        if (StringUtils.isNotBlank(id)) {
+            entity = factoryService.get(id);
+        }
+        if (entity == null) {
+            entity = new Factory();
+        }
+        return entity;
+    }
+
+
+    /**
+     * 列表使用接口
+     * @param factory
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
+    @RequiresPermissions("sierac:factory:view")
+    @RequestMapping(value = { "list", "" })
+    public String list(Factory factory, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Page<Factory> page = factoryService.findPage(new Page<Factory>(request, response), factory);
+        model.addAttribute("page", page);
+        return "sierac/factoryList";
+    }
+
+
+    /**
+     *跳转到详情页面
+     * @param factory
+     * @param model
+     * @return
+     */
+    @RequiresPermissions("sierac:factory:view")
+    @RequestMapping(value = "form")
+    public String form(Factory factory, Model model,HttpServletRequest request) {
+
+//        Cookie[] cookie = (Cookie[]) request.getCookies();
+
+        Date myCreateDate = factory.getCreateDate();
+        String strcDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(myCreateDate);
+        factory.setMycreateDate(strcDate);
+
+        Date myupDate = factory.getUpdateDate();
+        String struDate  = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(myupDate);
+        factory.setMyupdateDate(struDate);
+
+        User user  =  factory.getCreateBy();
+        String id = user.getId();
+
+        //1:系统管理员，04a02188e255439aa1c6115990ac9881:个人用户，a2ced556b9204030af85bb0fa862f4a7超级管理员
+        if(("1").equals(id)){
+              factory.setMyCreateBy("系统管理员");
+              factory.setMyUpdateBy("系统管理员");
+        }
+        if("04a02188e255439aa1c6115990ac9881".equals(id)){
+              factory.setMyCreateBy("个人用户");
+              factory.setMyUpdateBy("个人用户");
+        }
+        if("a2ced556b9204030af85bb0fa862f4a7超级管理员".equals((id))){
+              factory.setMyCreateBy("超级管理员");
+              factory.setMyUpdateBy("超级管理员");
+        }
+
+
+
+        model.addAttribute("factory", factory);
+        return "sierac/factoryFormDetail";
+    }
+
+    /**
+     * 跳转到添加页面
+     */
+    @RequiresPermissions("sierac:factory:view")
+    @RequestMapping(value = "formAdd")
+    public String formAdd(Factory factory, Model model) {
+        model.addAttribute("factory", factory);
+        return "sierac/factoryFormAdd";
+    }
+
+
+    /**
+     * 保存操作使用接口
+     * @param factory
+     * @param model
+     * @param redirectAttributes
+     * @param request
+     * @param response
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    @RequiresPermissions("sierac:factory:edit")
+    @RequestMapping(value = "save")
+    public String save(Factory factory, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request,
+                       HttpServletResponse response) throws UnsupportedEncodingException {
+        request.setCharacterEncoding("UTF-8");
+        if(!beanValidator(model,factory)){
+            return form(factory,model,request);
+        }
+        factoryService.save(factory);
+        addMessage(redirectAttributes,"保存成功");
+        return "redirect:" + Global.getAdminPath()+"/sierac/factory/?repage";
+
+    }
+}

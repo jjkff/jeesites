@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.sierac.dao.FactoryDao">
+   
+	<sql id="factoryColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.contacts AS "contacts",
+		a.tel AS "tel",
+        a.address AS "address",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="factoryJoins">
+	</sql>
+    
+	<select id="get" resultType="factory">
+		SELECT 
+			<include refid="factoryColumns"/>
+		FROM factory a
+		<include refid="factoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="factory">
+		SELECT 
+			<include refid="factoryColumns"/>
+		FROM factory a
+		<include refid="factoryJoins"/>
+		<where>
+
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findAll" resultType="factory">
+	SELECT id ,code,name,contacts,tel,address
+	FROM factory a
+	<include refid="factoryJoins"/>
+	<where>
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+	</select>
+	<select id="findByname" resultType="factory">
+	  SELECT id,name
+	  FROM factory 
+	</select>
+	<select id="findAllList" resultType="factory">
+		SELECT 
+			<include refid="factoryColumns"/>
+		FROM factory a
+		<include refid="factoryJoins"/>
+		<where>
+-- 			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO factory(
+			id,
+			code,
+			name,
+			contacts,
+			tel,
+			address,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{code},
+			#{name},
+			#{contacts},
+			#{tel},
+			#{address},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE factory SET 	
+			name = #{name},
+			contacts = #{contacts},
+			tel =#{tel},
+			address =#{address},
+			create_date = #{createDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!--<update id="delete">-->
+		<!--UPDATE factory SET -->
+			<!--del_flag = #{DEL_FLAG_DELETE}-->
+		<!--WHERE id = #{id}-->
+	<!--</update>-->
+	<select id="findByCode" resultType="factory">
+		SELECT
+			id
+		FROM
+			factory
+		WHERE
+			CODE =#{code}
+	</select>
+	<update id="truncate">
+		delete from factory
+	</update>
+
+	<select id = "findName" resultType="factory">
+        select * from factory where name = #{NAME}
+	</select>
+</mapper>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.sierac.dao.DistributorDao">
+    
+	<sql id="distributorColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.assessment_city as "assessmentCity",
+		a.is_enable AS "isEnable",
+        a.full_name as "fullName",
+        a.contacts as "contacts",
+        a.tel as "tel",
+        a.province as "province",
+        a.area as "area",
+        a.city as "city",
+        a.address as "address",
+        a.remarks as "remarks",
+        a.alternate_1 as "alternate_1",
+        a.alternate_2 as "alternate_3",
+        a.alternate_3 as "alternate_3",
+        a.alternate_4 as "alternate_4",
+        a.alternate_5 as "alternate_5",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate"
+	</sql>
+	
+	<sql id="distributoreJoins">
+	</sql>
+    
+	<select id="get" resultType="distributor">
+		SELECT 
+			<include refid="distributorColumns"/>
+		FROM distributor a
+		<include refid="distributoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="distributor">
+		SELECT
+		<include refid="distributorColumns"/>
+		FROM distributor a
+		<include refid="distributoreJoins"/>
+		<where>
+
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="findAll" resultType="distributor">
+		SELECT id ,name,assessment_city,is_enable,full_name,contacts,tel,province,area,city,address,remarks,alternate_1
+		alternate_2,alternate_3,alternate_4,alternate_5,alternate_6
+		FROM distributor a
+
+		<where>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+	</select>
+
+	<select id="findAllList" resultType="distributor">
+		SELECT
+		<include refid="distributorColumns"/>
+		FROM distributor a
+		<include refid="distributoreJoins"/>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+	<insert id="insert">
+		INSERT INTO distributor(
+			id,
+			name,
+			assessment_city,
+            is_enable,
+            full_name,
+			contacts,
+			tel,
+            province,
+            area,
+            city,
+			address,
+			remarks,
+			alternate_1,
+			alternate_2,
+			alternate_3,
+			alternate_4,
+			alternate_5,
+			alternate_6,
+			create_by,
+			create_date,
+			update_by,
+			update_date
+		) VALUES (
+			#{id},
+			#{name},
+			#{assessmentCity},
+            #{isEnable},
+            #{fullName},
+			#{contacts},
+			#{tel},
+			#{province},
+            #{area},
+            #{city},
+			#{address},
+			#{remarks},
+			#{alternate_1},
+			#{alternate_2},
+			#{alternate_3},
+			#{alternate_4},
+			#{alternate_5},
+			#{alternate_6},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE distributor SET
+		name = #{name},
+		assessment_city =#{assessmentCity},
+		is_enable =#{isEnable},
+		full_name =#{fullName},
+		contacts =#{contacts},
+		tel =#{tel},
+		province =#{province},
+		area =#{area},
+		city =#{city},
+		address =#{address},
+		remarks =#{remarks},
+        alternate_1 =#{alternate_1},
+        alternate_1 =#{alternate_2},
+        alternate_1 =#{alternate_3},
+        alternate_1 =#{alternate_4},
+        alternate_1 =#{alternate_5},
+        alternate_1 =#{alternate_6},
+		create_date = #{createDate},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+
+
+</mapper>

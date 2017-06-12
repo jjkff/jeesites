@@ -1,0 +1,50 @@
+package com.thinkgem.jeesite.sierac.unitTest;
+
+import com.thinkgem.jeesite.sierac.dao.ProductionTaskDao;
+import com.thinkgem.jeesite.sierac.entity.ProductionTask;
+import com.thinkgem.jeesite.sierac.service.ProductionTaskService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
+
+/**
+ * Created by jkf on 2017/5/20.
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({ "classpath:spring-context.xml" })
+public class ProductionTaskTest {
+
+    @Autowired
+    private ProductionTaskDao productionTaskDao;
+
+    @Test
+    public void add(){
+        ProductionTask productionTask = new ProductionTask();
+        productionTask.setId("jkfjkfjkf");
+        productionTask.setName("jkf");
+        productionTask.setCode("1111");
+        productionTask.setProductid("000");
+        productionTaskDao.insert(productionTask);
+    }
+
+    @Test
+    public void delete(){
+        ProductionTask productionTask = new ProductionTask();
+        productionTask.setId("jkfjkfjkf");
+        productionTaskDao.delete(productionTask);
+    }
+
+    @Autowired
+    private ProductionTaskService productionTaskService;
+    @Test
+    public void findAll(){
+        ProductionTask productionask = new ProductionTask();
+        List<ProductionTask> list = productionTaskService.findAll(productionask);
+
+    }
+
+}

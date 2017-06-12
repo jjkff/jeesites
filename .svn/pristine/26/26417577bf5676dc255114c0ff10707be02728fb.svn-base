@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.sierac.dao.DistributorDao">
+    
+	<sql id="distributorColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.assessment_city as "assessmentCity",
+		a.is_enable AS "isEnable",
+        a.full_name as "fullName",
+        a.contacts as "contacts",
+        a.tel as "tel",
+        a.province as "province",
+        a.area as "area",
+        a.city as "city",
+        a.address as "address",
+        a.remarks as "remarks",
+        a.alternate_1 as "alternate_1",
+        a.alternate_2 as "alternate_3",
+        a.alternate_3 as "alternate_3",
+        a.alternate_4 as "alternate_4",
+        a.alternate_5 as "alternate_5",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="distributoreJoins">
+	</sql>
+    
+	<select id="get" resultType="Distributor">
+		SELECT 
+			<include refid="distributorColumns"/>
+		FROM distributor a
+		<include refid="distributoreJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+
+
+</mapper>

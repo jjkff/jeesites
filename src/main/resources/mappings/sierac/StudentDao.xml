@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.sierac.dao.StudentDao">
+   
+	<sql id="studentColumns">
+		a.id AS "id",
+	    a.name AS "name",
+		a.del_flag AS "delFlag",
+		a.age AS "age",
+		a.address AS "address",
+		a.grade_id AS "gradeId",
+		a.teacher_name AS "teacherName"
+	</sql>
+	
+	<sql id="studentJoins">
+	</sql>
+    
+	<select id="get" resultType="Student">
+		SELECT 
+			<include refid="studentColumns"/>
+		FROM student a
+		<include refid="studentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Student">
+		SELECT 
+			<include refid="studentColumns"/>
+		FROM student a
+		<include refid="studentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findAll" resultType="Student">
+	SELECT id ,name
+	FROM student a
+	<include refid="studentJoins"/>
+	<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+	</select>
+	<select id="findByname" resultType="Student">
+	  SELECT id,name
+	  FROM student
+	</select>
+	<select id="findAllList" resultType="Student">
+		SELECT 
+			<include refid="studentColumns"/>
+		FROM student a
+		<include refid="studentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO Student(
+			id,
+			name,
+			del_flag,
+			age,
+			address,
+			grade_id,
+			teacher_name
+		) VALUES (
+			#{id},
+			#{name},
+			#{delFlag},
+			#{age},
+			#{address},
+			#{gradeId},
+			#{teacherName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE student SET
+			name = #{name},
+			age =#{age},
+			address = #{address},
+			grade_id = #{gradeId},
+			teacher_name = #{teacherName}
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE student SET
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="truncate">
+		delete from student
+	</update>
+
+	<select id = "findName" resultType="Student">
+        select * from student where name = #{NAME}
+	</select>
+</mapper>

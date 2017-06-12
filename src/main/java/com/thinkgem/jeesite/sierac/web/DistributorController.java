@@ -1,0 +1,129 @@
+package com.thinkgem.jeesite.sierac.web;
+
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.sierac.entity.Distributor;
+import com.thinkgem.jeesite.sierac.service.DistributorService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * 经销商控制层：
+ * Created by jkf on 2017/6/8.
+ */
+@Controller
+@RequestMapping(value = "${adminPath}/sierac/distributor")
+public class DistributorController extends BaseController{
+
+    @Autowired
+    private DistributorService distributorService;
+
+    @ModelAttribute
+    public Distributor get(@RequestParam(required = false) String id){
+
+        Distributor entity = null;
+        if(StringUtils.isNoneBlank(id)){
+           entity  = distributorService.get(id);
+        }
+        if(entity == null){
+           entity = new Distributor();
+        }
+        return entity;
+    }
+
+    @RequiresPermissions("sierac:distributor:view")
+    @RequestMapping(value={"list",""})
+    public String list(Distributor distributor, HttpServletRequest request, HttpServletResponse response, Model model){
+        Page<Distributor> page = distributorService.findPage(new Page<Distributor>(request,response),distributor);
+        model.addAttribute("page",page);
+        return "sierac/distributorList";
+    }
+
+
+    /**
+     * 跳转到页面详情
+     * @param distributor
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequiresPermissions("sierac:distributor:view")
+    @RequestMapping(value = "form")
+    public String form(Distributor distributor , Model model, HttpServletRequest request ){
+        model.addAttribute("distributor",distributor);
+        return "sierac/distributorFormDetail";
+    }
+
+    /**
+     * 跳转到新增页面
+     * @param distributor
+     * @param model
+     * @return
+     */
+    @RequiresPermissions("sierac:distributor:view")
+    @RequestMapping("formAdd")
+    public String formAdd(Distributor distributor, Model model){
+        model.addAttribute("distributor",distributor);
+        return "sierac/distributorFormAdd";
+    }
+
+    /**
+     * 保存经销商信息
+     * @param distributor
+     * @param model
+     * @param redirectAttributes
+     * @param request
+     * @param response
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    @RequiresPermissions("sierac:distributor:edit")
+    @RequestMapping("save")
+    public String save(Distributor distributor , Model model , RedirectAttributes redirectAttributes , HttpServletRequest request, HttpServletResponse response)
+    throws UnsupportedEncodingException
+    {
+         request.setCharacterEncoding("UTF-8");
+         if(!beanValidator(model,distributor)){
+             return form(distributor,model,request);
+         }
+         distributor.setCreateDate(new Date());
+         String strcDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(distributor.getCreateDate());
+         distributor.setMyCreateDate(strcDate);
+         distributorService.save(distributor);
+         addMessage(redirectAttributes,"保存成功");
+         model.addAttribute("distributor",distributor);
+         return "redirect:"+ Global.getAdminPath()+"/sierac/distributor/?repage";
+    }
+
+    /**
+     * 经销商更新
+     * @param distributor
+     * @param model
+     * @return
+     */
+        @RequiresPermissions("sierac:distributor:view")
+        @RequestMapping(value="formUp")
+        public String formUp(Distributor distributor ,Model model){
+            model.addAttribute("distributor",distributor);
+            return "sierac/distributorUpdateForm";
+    }
+
+
+
+
+
+}
